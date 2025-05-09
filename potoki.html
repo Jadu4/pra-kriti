@@ -558,7 +558,33 @@
   canvas.style.display = 'block';
   downloadBtn.style.display = 'block'; // Показываем кнопку скачивания
 
-  // Остальной код создания графика...
+  // Подготовка данных для графика
+  const ctx = canvas.getContext('3d');
+  const labels = [...new Set(db.map(e => e.date))].sort();
+  const types = ['физическая', 'эмоциональная', 'ментальная', 'социальная', 'духовная', 'временная'];
+  
+  const datasets = types.map(type => ({
+    label: type,
+    data: labels.map(date => db.filter(e => e.date === date && e.type === type).length),
+    borderWidth: 1,
+    fill: true,
+    tension: 0.3
+  }));
+
+  // Уничтожаем старый график (если был)
+  if (window.threadChartInstance) {
+    window.threadChartInstance.destroy();
+  }
+
+  // Создаём новый график
+  window.threadChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      scales: { y: { beginAtZero: true } }
+    }
+  });
 }
 
   // Расчет потока
