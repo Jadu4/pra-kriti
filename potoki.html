@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>💫 Центр Нитей + Поток Сознания</title>
+  <title>💫 Поток Сознания</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -447,39 +447,41 @@
     container.appendChild(newFiber);
   }
 
-  // Сохранение записи нити
+  // Сохранение новой записи о нити
   function saveThread() {
     const date = document.getElementById('thread-date').value;
     const name = document.getElementById('thread-name').value;
-    const type = document.getElementById('thread-type').value;
+    const type = document.getElementById('thread-type').value; // ✅ Теперь берём значение из правильного поля
     const state = document.getElementById('thread-state').value;
     const desc = document.getElementById('thread-desc').value;
     const harmonize = document.getElementById('thread-harmonize').value;
 
-    if (!date || !name) return alert("❗ Укажите дату и название нити");
+    if (!date || !name) {
+      alert("❗ Укажите дату и название нити");
+      return;
+    }
 
-    const entry = { 
-      date, 
-      name, 
-      type, 
-      state, 
-      desc, 
+    const entry = {
+      date,
+      name,
+      type, // ✅ Теперь тип будет правильным
+      state,
+      desc,
       harmonize,
       timestamp: new Date().toISOString()
     };
-    
+
     db.push(entry);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
     updateHistory();
-    updateChart();
     clearForm();
   }
 
-  // Очистка формы
+  // Очистка формы после сохранения
   function clearForm() {
     document.getElementById('thread-date').value = '';
     document.getElementById('thread-name').value = '';
-    document.getElementById('thread-type').value = 'физическая';
+    document.getElementById('thread-type').value = 'физическая'; // или 'ментальная', если хочешь по умолчанию
     document.getElementById('thread-state').value = '';
     document.getElementById('thread-desc').value = '';
     document.getElementById('thread-harmonize').value = '';
@@ -489,31 +491,63 @@
   function updateHistory() {
     const list = document.getElementById('history-list');
     list.innerHTML = '';
-    
-    // Сортируем по дате (новые сверху)
-    const sortedEntries = [...db].sort((a, b) => 
-      new Date(b.timestamp) - new Date(a.timestamp));
-    
-    sortedEntries.forEach(e => {
-      const item = document.createElement('li');
-      item.innerHTML = `
-        <strong>[${e.date}] ${e.name}</strong>
-        <br>${e.state}
-        <br><small>${e.type}</small>
-        <button class="delete-btn" onclick="deleteThread('${e.timestamp}')">×</button>
+
+    db.forEach(e => {
+      list.innerHTML += `
+        <li style="margin-bottom: 1em;">
+          <strong>[${e.date}] ${e.name}</strong><br>
+          Тип: ${e.type}<br> <!-- ✅ Здесь отображается правильный тип -->
+          Состояние: ${e.state}<br>
+          <small>Описание: ${e.desc}</small><br>
+          Гармонизация: ${e.harmonize}<br>
+          <button class="delete-btn" data-timestamp="${e.timestamp}">🗑 Удалить</button>
+        </li>
       `;
-      list.appendChild(item);
     });
   }
 
-  // Удаление записи нити
+  // Удаление записи
   function deleteThread(timestamp) {
-    if (confirm("Удалить эту запись?")) {
-      db = db.filter(e => e.timestamp !== timestamp);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-      updateHistory();
-      updateChart();
-    }
+    if (!timestamp || !confirm("Удалить эту запись?")) return;
+    
+    db = db.filter(e => e.timestamp !== timestamp);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    updateHistory();
+    updateChart();
+  }
+
+  // Обновление графика
+  function updateChart() {
+    const ctx = document.getElementById('threadChart')?.getContext('2d');
+    if (!ctx) return;
+
+    const labels = [...new Set(db.map(e => e.date))].sort();
+    const types = ['физическая', 'эмоциональная', 'ментальная', 'социальная', 'духовная', 'временная'];
+
+    const datasets = types.map(type => ({
+      label: type,
+      data: labels.map(date => db.filter(e => e.date === date && e.type === type).length),
+      borderColor: '#' + Math.floor(Math.random()*16777215).toString(16),
+      backgroundColor: 'rgba(0, 0, 0, 0.05)',
+      fill: false,
+      tension: 0.3
+    }));
+
+    if (window.threadChartInstance) window.threadChartInstance.destroy();
+
+    window.threadChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
   }
 
   // Обновление графика
@@ -861,10 +895,18 @@
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('thread-date').value = today;
     
+    // Обработчик для удаления записей
+    document.getElementById('history-list').addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete-btn')) {
+            const timestamp = e.target.getAttribute('data-timestamp');
+            deleteThread(timestamp);
+        }
+    });
+    
     updateHistory();
     updateChart();
     updateFlowHistory();
-  }
+}
 
   window.onload = initApp;
 </script>
