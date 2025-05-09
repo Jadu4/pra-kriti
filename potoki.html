@@ -245,13 +245,36 @@
   .dark-mode .modal-text td {
     border-color: #555;
   }
+  .help-toggle {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background: #2980b9;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .dark-mode .help-toggle {
+    background: #3a7ca5;
+    color: white;
+  }
+  
+  .help-toggle:hover {
+    background: #1a6ca8;
+  }
+  
+  .dark-mode .help-toggle:hover {
+    background: #2c6a8d;
+  }
   </style>
 </head>
 <body>
 
 <header>
   <h1>💫 Поток Сознания</h1>
-  <button class="theme-toggle" onclick="showHelpModal()">❓ Как это работает</button>
+  <button class="help-toggle" onclick="showHelpModal()">❓ Как это работает</button>
   <button class="theme-toggle" onclick="toggleTheme()">🌙 Темная тема</button>
 </header>
 
@@ -483,18 +506,25 @@
     if (savedTheme === 'dark') {
       document.body.classList.add('dark-mode');
       document.querySelector('.theme-toggle').textContent = '☀️ Светлая тема';
+      document.querySelector('.help-toggle').style.backgroundColor = '#3a7ca5';
+    } else {
+      document.querySelector('.help-toggle').style.backgroundColor = '#2980b9';
     }
   }
 
   // Переключение темы
   function toggleTheme() {
     document.body.classList.toggle('dark-mode');
+    const helpButton = document.querySelector('.help-toggle');
+    
     if (document.body.classList.contains('dark-mode')) {
       localStorage.setItem(THEME_KEY, 'dark');
       document.querySelector('.theme-toggle').textContent = '☀️ Светлая тема';
+      helpButton.style.backgroundColor = '#3a7ca5';
     } else {
       localStorage.setItem(THEME_KEY, 'light');
       document.querySelector('.theme-toggle').textContent = '🌙 Темная тема';
+      helpButton.style.backgroundColor = '#2980b9';
     }
   }
 
