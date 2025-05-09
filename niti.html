@@ -67,6 +67,30 @@
       border-radius: 5px;
       overflow-x: auto;
     }
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin: 1em 0;
+    }
+    .math {
+      font-family: "Times New Roman", serif;
+      font-style: italic;
+    }
+    .positive { color: #2ecc71; }
+    .negative { color: #e74c3c; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background-color: #f8f9fa;
+    }
   </style>
 </head>
 <body>
@@ -106,18 +130,28 @@
   <div class="section">
     <h2>🧮 Анализ Потока Сознания</h2>
     <p><strong>Введите параметры для анализа состояния фокуса и комплементарности нитей.</strong></p>
+    
+    <label>Название задачи:</label>
+    <input type="text" id="task-name" placeholder="Опишите текущую задачу">
+    
     <label>Время настройки T (мин):</label>
     <input type="number" id="T" value="5">
+    
     <label>Начальный фокус A₀ (%):</label>
-    <input type="number" id="A0" value="100">
+    <input type="number" id="A0" value="100" min="0" max="100">
+    
     <label>Текущий фокус Aₜ (%):</label>
-    <input type="number" id="At" value="30">
+    <input type="number" id="At" value="30" min="0" max="100">
+    
     <label>Веса волокон kᵢ (через запятую):</label>
-    <input type="text" id="ki" value="0.5, 0.3, 0.2">
+    <input type="text" id="ki" value="0.5, 0.3, 0.2" placeholder="0.5, 0.3, 0.2">
+    
     <label>Доступность wᵢ (через запятую):</label>
-    <input type="text" id="wi" value="1.0, 0.8, 0.5">
+    <input type="text" id="wi" value="1.0, 0.8, 0.5" placeholder="1.0, 0.8, 0.5">
+    
     <label>Помехи dᵢ (через запятую):</label>
-    <input type="text" id="di" value="1.0, 1.2, 0.9">
+    <input type="text" id="di" value="1.0, 1.2, 0.9" placeholder="1.0, 1.2, 0.9">
+    
     <button onclick="calculateFlow()">📊 Рассчитать</button>
   </div>
 
@@ -173,20 +207,15 @@
 
 </main>
 
-<!-- Mermaid диаграммы -->
-<script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-  mermaid.initialize({ startOnLoad: false });
-  window.mermaid = mermaid;
-</script>
-
 <!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js "></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <!-- Основной JS -->
 <script>
   const STORAGE_KEY = 'threads_db';
+  const FLOW_STORAGE_KEY = 'flow_results_db';
   let db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  let flowResults = JSON.parse(localStorage.getItem(FLOW_STORAGE_KEY)) || [];
 
   // Названия волокон
   const fiberNames = {
@@ -205,7 +234,16 @@
 
     if (!date || !name) return alert("❗ Укажите дату и название нити");
 
-    const entry = { date, name, type, state, desc, harmonize };
+    const entry = { 
+      date, 
+      name, 
+      type, 
+      state, 
+      desc, 
+      harmonize,
+      timestamp: new Date().toISOString()
+    };
+    
     db.push(entry);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
     updateHistory();
@@ -225,17 +263,35 @@
   function updateHistory() {
     const list = document.getElementById('history-list');
     list.innerHTML = '';
-    db.forEach(e => {
+    
+    // Сортируем по дате (новые сверху)
+    const sortedEntries = [...db].sort((a, b) => 
+      new Date(b.timestamp) - new Date(a.timestamp));
+    
+    sortedEntries.forEach(e => {
       const item = document.createElement('li');
-      item.innerHTML = `<strong>[${e.date}] ${e.name}</strong><br>${e.state}<br><small>${e.type}</small>`;
+      item.innerHTML = `
+        <strong>[${e.date}] ${e.name}</strong>
+        <br>${e.state}
+        <br><small>${e.type}</small>
+        <button onclick="deleteThread('${e.timestamp}')" style="float: right; padding: 2px 5px; font-size: 12px;">×</button>
+      `;
       list.appendChild(item);
     });
+  }
+
+  function deleteThread(timestamp) {
+    db = db.filter(e => e.timestamp !== timestamp);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    updateHistory();
+    updateChart();
   }
 
   function updateChart() {
     const ctx = document.getElementById('threadChart').getContext('2d');
     const labels = [...new Set(db.map(e => e.date))].sort();
     const types = ['физическая', 'эмоциональная', 'ментальная', 'социальная', 'духовная', 'временная'];
+    
     const datasets = types.map(type => ({
       label: type,
       data: labels.map(date => db.filter(e => e.date === date && e.type === type).length),
@@ -243,7 +299,11 @@
       fill: true,
       tension: 0.3
     }));
-    if (window.threadChartInstance) window.threadChartInstance.destroy();
+    
+    if (window.threadChartInstance) {
+      window.threadChartInstance.destroy();
+    }
+    
     window.threadChartInstance = new Chart(ctx, {
       type: 'line',
       data: {
@@ -260,91 +320,206 @@
   }
 
   function calculateFlow() {
-  const T = parseFloat(document.getElementById('T').value);
-  const A0 = parseFloat(document.getElementById('A0').value);
-  const At = parseFloat(document.getElementById('At').value);
-  const ki = document.getElementById('ki').value.split(',').map(Number);
-  const wi = document.getElementById('wi').value.split(',').map(Number);
-  const di = document.getElementById('di').value.split(',').map(Number);
+    const T = parseFloat(document.getElementById('T').value);
+    const A0 = parseFloat(document.getElementById('A0').value);
+    const At = parseFloat(document.getElementById('At').value);
+    const task = document.getElementById('task-name').value;
+    const ki = document.getElementById('ki').value.split(',').map(x => parseFloat(x.trim())).filter(x => !isNaN(x));
+    const wi = document.getElementById('wi').value.split(',').map(x => parseFloat(x.trim())).filter(x => !isNaN(x));
+    const di = document.getElementById('di').value.split(',').map(x => parseFloat(x.trim())).filter(x => !isNaN(x));
 
-  if (isNaN(T) || isNaN(A0) || isNaN(At) || ki.length !== wi.length || wi.length !== di.length) {
-    document.getElementById('flow-result').innerHTML = "<p>❌ Проверьте правильность введённых данных</p>";
-    return;
-  }
-
-  // Расчёты
-  const fp = (1 / T) * Math.log(A0 / At);
-  const C = ki.reduce((sum, k, i) => sum + (k * wi[i] / di[i]), 0).toFixed(2);
-
-  const fiberNames = {
-    1: "Когнитивное",
-    2: "Энергетическое",
-    3: "Интуитивное"
-  };
-
-  const fibers = ki.map((k, i) => ({
-    num: i + 1,
-    contribution: (k * wi[i] / di[i]).toFixed(2),
-    status: di[i] > 1.1 ? "❗ Помехи" : wi[i] < 0.5 ? "🔍 Слабо" : "✅ Норма"
-  }));
-
-  // Формирование результата
-  let resultHTML = `
-    <h3>🌌 Параметры потока</h3>
-    <p><strong>fₚ</strong> = (1/${T}) · ln(${A0}/${At}) ≈ ${fp.toFixed(2)} Гц</p>
-    <p><strong>C</strong> = Σ(k·w/d) ≈ ${C}</p>
-    <p><strong>Статус:</strong> ${C >= 1 ? "✅ Синхронизировано" : "❌ Требует коррекции"}</p>
-  `;
-
-  // Диаграмма Mermaid с названиями волокон
-  let pieData = "";
-  fibers.forEach(f => {
-    const name = fiberNames[f.num] || `Волокно ${f.num}`;
-    pieData += `"${name} (${f.contribution})" : ${f.contribution}\n    `;
-  });
-
-  resultHTML += `
-    <h3>🪞 Диаграмма вклада</h3>
-    \`\`\`mermaid
-    pie showData
-        title Комплементарность (C = ${C})
-        ${pieData}
-    \`\`\`
-  `;
-
-  // Рекомендации
-  const badFibers = fibers.filter(f => f.status !== "✅ Норма");
-  if (badFibers.length > 0 && C < 1) {
-    resultHTML += `<h3>💡 Рекомендации</h3><ul>`;
-    badFibers.forEach(f => {
-      resultHTML += `<li>Волокно ${f.num}: ${f.d > 1.1 ? `Уменьшите помехи (сейчас ${f.d})` : `Усильте доступность (сейчас ${f.w})`}</li>`;
-    });
-    resultHTML += `</ul>`;
-  }
-
-  // Вставка результата
-  document.getElementById('flow-result').innerHTML = resultHTML;
-
-  // Рендеринг Mermaid
-  setTimeout(() => {
-    try {
-      if (typeof mermaid !== 'undefined' && mermaid.init) {
-        mermaid.init();
-      } else {
-        console.error("Mermaid не загружен");
-      }
-    } catch (e) {
-      console.error("Ошибка Mermaid:", e);
+    // Проверка данных
+    let errorMessage = "";
+    if (ki.length !== wi.length || wi.length !== di.length) {
+      errorMessage = "❌ Длины массивов ki, wi, di не совпадают";
+    } else if (isNaN(T) || isNaN(A0) || isNaN(At)) {
+      errorMessage = "❌ T, A0, At должны быть числами";
     }
-  }, 100); // Задержка 100 мс
-}
+
+    if (errorMessage) {
+      document.getElementById('flow-result').innerHTML = `
+        <div class="section">
+          <h3>Ошибка</h3>
+          <p>${errorMessage}</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Расчёты
+    const fp = (1 / T) * Math.log(A0 / At);
+    const C = ki.reduce((sum, k, i) => sum + (k * wi[i] / di[i]), 0).toFixed(2);
+    
+    const fibers = ki.map((k, i) => ({
+      num: i + 1,
+      k: k,
+      w: wi[i],
+      d: di[i],
+      contribution: (k * wi[i] / di[i]).toFixed(2),
+      status: di[i] > 1.1 ? "❗ Помехи" : wi[i] < 0.5 ? "🔍 Слабо" : "✅ Норма"
+    }));
+
+    // Сохраняем результат
+    const flowResult = {
+      timestamp: new Date().toISOString(),
+      task,
+      T, A0, At, fp, C,
+      fibers: [...fibers],
+      date: new Date().toLocaleDateString()
+    };
+    
+    flowResults.push(flowResult);
+    localStorage.setItem(FLOW_STORAGE_KEY, JSON.stringify(flowResults));
+
+    // Формирование результата
+    let resultHTML = `
+      <div class="section">
+        <h3>🌊 Параметры потока ${task ? `"${task}"` : ''}</h3>
+        
+        <h4>📈 Резонансная частота: ${fp.toFixed(2)} Гц</h4>
+        <p class="math">fₚ = (1/T) · ln(A₀/Aₜ)</p>
+        
+        <table>
+          <tr>
+            <th>Параметр</th>
+            <th>Значение</th>
+            <th>Интерпретация</th>
+          </tr>
+          <tr>
+            <td class="math">T</td>
+            <td>${T} мин</td>
+            <td>${T} минут настройки</td>
+          </tr>
+          <tr>
+            <td class="math">A₀ → Aₜ</td>
+            <td>${A0}% → ${At}%</td>
+            <td>Потеря фокуса: ${(100 - At).toFixed(0)}%</td>
+          </tr>
+          <tr>
+            <td class="math">fₚ</td>
+            <td>${fp.toFixed(2)} Гц</td>
+            <td>${fp < 0.3 ? "Глубокий поток" : "Активный режим"}</td>
+          </tr>
+        </table>
+        
+        <h4>🧮 Комплементарность волокон: ${C} ${C >= 1 ? "✅" : "❌"}</h4>
+        <p class="math">C = Σ(kᵢ·wᵢ/dᵢ)</p>
+        
+        <table>
+          <tr>
+            <th>Волокно</th>
+            <th class="math">kᵢ</th>
+            <th class="math">wᵢ</th>
+            <th class="math">dᵢ</th>
+            <th>Вклад</th>
+            <th>Статус</th>
+          </tr>
+          ${fibers.map(f => `
+            <tr>
+              <td>${fiberNames[f.num] || `Волокно ${f.num}`}</td>
+              <td>${f.k}</td>
+              <td>${f.w}</td>
+              <td>${f.d}</td>
+              <td>${f.contribution}</td>
+              <td class="${f.status.includes('✅') ? 'positive' : 'negative'}">${f.status}</td>
+            </tr>
+          `).join('')}
+        </table>
+        
+        <h4>📊 Визуализация вклада</h4>
+        <div class="chart-container">
+          <canvas id="pieChart"></canvas>
+        </div>
+    `;
+
+    // Рекомендации
+    const badFibers = fibers.filter(f => f.status !== "✅ Норма");
+    if (badFibers.length > 0 && C < 1) {
+      resultHTML += `
+        <h4>💡 Рекомендации:</h4>
+        <ul>
+          ${badFibers.map(f => `
+            <li>
+              <strong>${fiberNames[f.num] || `Волокно ${f.num}`}</strong>: 
+              ${f.d > 1.1 ? `Уменьшите помехи (сейчас ${f.d})` : `Усильте доступность (сейчас ${f.w})`}
+            </li>
+          `).join('')}
+        </ul>
+      `;
+    }
+
+    resultHTML += `</div>`;
+
+    // Вставка результата
+    document.getElementById('flow-result').innerHTML = resultHTML;
+
+    // Создание круговой диаграммы
+    setTimeout(() => {
+      const ctx = document.getElementById('pieChart')?.getContext('2d');
+      if (ctx) {
+        // Удаляем предыдущую диаграмму, если она существует
+        if (window.pieChartInstance) {
+          window.pieChartInstance.destroy();
+        }
+        
+        window.pieChartInstance = new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: fibers.map(f => {
+              const name = fiberNames[f.num] || `Волокно ${f.num}`;
+              return `${name} (${f.contribution})`;
+            }),
+            datasets: [{
+              data: fibers.map(f => parseFloat(f.contribution)),
+              backgroundColor: [
+                '#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f', '#edc948', '#b07aa1'
+              ],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: `Комплементарность (C = ${C})`,
+                font: {
+                  size: 16
+                }
+              },
+              legend: {
+                position: 'right',
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const label = context.label || '';
+                    const value = context.raw || 0;
+                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                    const percentage = Math.round((value / total) * 100);
+                    return `${label}: ${value} (${percentage}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    }, 100);
+  }
 
   function exportData() {
-    const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+    const data = {
+      threads: db,
+      flowResults: flowResults
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'niti_export.json';
+    a.download = 'niti_export_' + new Date().toISOString().slice(0, 10) + '.json';
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -352,24 +527,39 @@
   function importData(event) {
     const file = event.target.files[0];
     if (!file) return;
+    
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = function(e) {
       try {
         const imported = JSON.parse(e.target.result);
-        db = imported;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+        
+        if (imported.threads) {
+          db = imported.threads;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+        }
+        
+        if (imported.flowResults) {
+          flowResults = imported.flowResults;
+          localStorage.setItem(FLOW_STORAGE_KEY, JSON.stringify(flowResults));
+        }
+        
         updateHistory();
         updateChart();
         alert("✅ Данные успешно импортированы");
       } catch (err) {
-        alert("❌ Ошибка импорта");
+        console.error(err);
+        alert("❌ Ошибка импорта: " + err.message);
       }
     };
     reader.readAsText(file);
   }
 
-  // Инициализация
+  // Инициализация при загрузке
   function initApp() {
+    // Устанавливаем сегодняшнюю дату по умолчанию
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('thread-date').value = today;
+    
     updateHistory();
     updateChart();
   }
