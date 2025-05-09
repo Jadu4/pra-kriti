@@ -186,12 +186,72 @@
     .updating {
       opacity: 0.5;
     }
+    .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+  }
+  
+  .modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 700px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  .dark-mode .modal-content {
+    background-color: #2c2c2c;
+    color: white;
+  }
+  
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .close:hover {
+    color: black;
+  }
+  
+  .dark-mode .close:hover {
+    color: white;
+  }
+  
+  .modal-text table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+  }
+  
+  .modal-text th, .modal-text td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .dark-mode .modal-text th, 
+  .dark-mode .modal-text td {
+    border-color: #555;
+  }
   </style>
 </head>
 <body>
 
 <header>
   <h1>💫 Поток Сознания</h1>
+  <button class="theme-toggle" onclick="showHelpModal()">❓ Как это работает</button>
   <button class="theme-toggle" onclick="toggleTheme()">🌙 Темная тема</button>
 </header>
 
@@ -907,6 +967,23 @@
     link.click();
   }
 
+  // Функции для управления модальным окном
+  function showHelpModal() {
+    document.getElementById('helpModal').style.display = 'block';
+  }
+  
+  function closeHelpModal() {
+    document.getElementById('helpModal').style.display = 'none';
+  }
+  
+  // Закрытие при клике вне окна
+  window.onclick = function(event) {
+    const modal = document.getElementById('helpModal');
+    if (event.target == modal) {
+      modal.style.display = 'none';
+    }
+  }
+
   // Инициализация при загрузке
   function initApp() {
     initTheme();
@@ -931,6 +1008,55 @@
 
   window.onload = initApp;
 </script>
-
+<div id="helpModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeHelpModal()">&times;</span>
+    <h2>🔍 Как работает анализ потока сознания</h2>
+    <div class="modal-text">
+      <h3>📉 1. Резонансная частота (fₚ)</h3>
+      <p>Формула: <code>fₚ = (1 / T) · ln(A₀ / Aₜ)</code></p>
+      <p>Где:</p>
+      <ul>
+        <li><strong>T</strong> — время настройки (минуты)</li>
+        <li><strong>A₀</strong> — начальный фокус (%)</li>
+        <li><strong>Aₜ</strong> — текущий фокус (%)</li>
+      </ul>
+      
+      <p><strong>Пример:</strong><br>
+      Если T = 5 мин, A₀ = 100%, Aₜ = 30%, то:<br>
+      <code>fₚ = (1/5) · ln(100/30) ≈ 0.24 Гц</code></p>
+      
+      <p><strong>Интерпретация:</strong></p>
+      <ul>
+        <li><strong>fₚ < 0.3 Гц</strong> → Глубокий поток (высокая концентрация)</li>
+        <li><strong>fₚ ≥ 0.3 Гц</strong> → Активный режим (рассеянное внимание)</li>
+      </ul>
+      
+      <h3>🧵 2. Комплементарность волокон (C)</h3>
+      <p>Формула: <code>C = Σ(kᵢ · wᵢ / dᵢ)</code></p>
+      <p>Где:</p>
+      <ul>
+        <li><strong>kᵢ</strong> — важность волокна (0.1–1.0)</li>
+        <li><strong>wᵢ</strong> — доступность волокна (0–1.0)</li>
+        <li><strong>dᵢ</strong> — уровень помех (≥0.1)</li>
+      </ul>
+      
+      <table>
+        <tr><th>Волокно</th><th>kᵢ</th><th>wᵢ</th><th>dᵢ</th><th>Вклад (k·w/d)</th></tr>
+        <tr><td>Когнитивное</td><td>0.5</td><td>1.0</td><td>1.0</td><td>0.50</td></tr>
+        <tr><td>Энергетическое</td><td>0.3</td><td>0.8</td><td>1.2</td><td>0.20</td></tr>
+        <tr><td>Интуитивное</td><td>0.2</td><td>0.5</td><td>0.9</td><td>0.11</td></tr>
+      </table>
+      
+      <p><strong>C = 0.50 + 0.20 + 0.11 = 0.81</strong></p>
+      
+      <p><strong>Интерпретация:</strong></p>
+      <ul>
+        <li><strong>C ≥ 1.0</strong> → Синхронизировано ✅</li>
+        <li><strong>C < 1.0</strong> → Требует коррекции ❌</li>
+      </ul>
+    </div>
+  </div>
+</div>
 </body>
 </html>
