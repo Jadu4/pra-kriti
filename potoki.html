@@ -281,6 +281,7 @@
   <div class="section">
     <h2>📈 Граф динамики нитей</h2>
     <canvas id="threadChart" height="100"></canvas>
+    <button onclick="downloadChart('threadChart')">💾 Скачать график</button>
   </div>
 
   <!-- 5. История записей -->
@@ -710,6 +711,7 @@
         <h4>📊 Визуализация вклада</h4>
         <div class="chart-container">
           <canvas id="pieChart"></canvas>
+          <button onclick="downloadChart('pieChart')">💾 Скачать диаграмму</button>
         </div>
     `;
 
@@ -886,6 +888,15 @@
     reader.readAsText(file);
   }
 
+  // Функция для скачивания графика
+  function downloadChart(chartId) {
+    const canvas = document.getElementById(chartId);
+    const link = document.createElement('a');
+    link.download = `${chartId}-${new Date().toISOString().slice(0, 10)}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }
+  
   // Инициализация при загрузке
   function initApp() {
     initTheme();
