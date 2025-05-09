@@ -165,6 +165,12 @@
       padding: 5px 10px;
       font-size: 14px;
     }
+    .empty-state {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
@@ -519,69 +525,36 @@
 
   // Обновление графика
   function updateChart() {
-    const ctx = document.getElementById('threadChart')?.getContext('2d');
-    if (!ctx) return;
-
-    const labels = [...new Set(db.map(e => e.date))].sort();
-    const types = ['физическая', 'эмоциональная', 'ментальная', 'социальная', 'духовная', 'временная'];
-
-    const datasets = types.map(type => ({
-      label: type,
-      data: labels.map(date => db.filter(e => e.date === date && e.type === type).length),
-      borderColor: '#' + Math.floor(Math.random()*16777215).toString(16),
-      backgroundColor: 'rgba(0, 0, 0, 0.05)',
-      fill: false,
-      tension: 0.3
-    }));
-
-    if (window.threadChartInstance) window.threadChartInstance.destroy();
-
-    window.threadChartInstance = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels,
-        datasets
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: { beginAtZero: true }
-        }
-      }
-    });
+  const ctx = document.getElementById('threadChart')?.getContext('2d');
+  const container = document.getElementById('threadChart').parentElement; // Контейнер графика
+  
+  // Если данных нет - скрываем блок
+  if (db.length === 0) {
+    container.style.display = 'none';
+    return;
   }
-
-  // Обновление графика
-  function updateChart() {
-    const ctx = document.getElementById('threadChart')?.getContext('2d');
-    if (!ctx) return;
-    
-    const labels = [...new Set(db.map(e => e.date))].sort();
-    const types = ['физическая', 'эмоциональная', 'ментальная', 'социальная', 'духовная', 'временная'];
-    const datasets = types.map(type => ({
-      label: type,
-      data: labels.map(date => db.filter(e => e.date === date && e.type === type).length),
-      borderWidth: 1,
-      fill: true,
-      tension: 0.3
-    }));
-    
-    if (window.threadChartInstance) {
-      window.threadChartInstance.destroy();
-    }
-    
+  
+  // Если данные есть - показываем блок
+  container.style.display = 'block';
+  
+  const labels = [...new Set(db.map(e => e.date))].sort();
+  const types = ['физическая', 'эмоциональная', 'ментальная', 'социальная', 'духовная', 'временная'];
+  const datasets = types.map(type => ({
+    label: type,
+    data: labels.map(date => db.filter(e => e.date === date && e.type === type).length),
+    borderWidth: 1,
+    fill: true,
+    tension: 0.3
+  }));
+  
+  if (window.threadChartInstance) {
+    window.threadChartInstance.destroy();
+  }
+  
     window.threadChartInstance = new Chart(ctx, {
       type: 'line',
-      data: {
-        labels,
-        datasets
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: { beginAtZero: true }
-        }
-      }
+      data: { labels, datasets },
+      options: { responsive: true, scales: { y: { beginAtZero: true } } }
     });
   }
 
@@ -896,7 +869,7 @@
     link.href = canvas.toDataURL('image/png');
     link.click();
   }
-  
+
   // Инициализация при загрузке
   function initApp() {
     initTheme();
