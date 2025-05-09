@@ -566,7 +566,7 @@
   downloadBtn.style.display = 'block'; // Показываем кнопку скачивания
 
   // Подготовка данных для графика
-  const ctx = canvas.getContext('3d');
+  const ctx = canvas.getContext('2d');
   const labels = [...new Set(db.map(e => e.date))].sort();
   const types = ['физическая', 'эмоциональная', 'ментальная', 'социальная', 'духовная', 'временная'];
   
