@@ -171,6 +171,15 @@
       color: #666;
       font-style: italic;
     }
+    #noDataMessage {
+      font-style: italic;
+      background: #f9f9f9;
+      border-radius: 5px;
+    }
+    .dark-mode #noDataMessage {
+      background: #333;
+      color: #ddd;
+    }
   </style>
 </head>
 <body>
@@ -285,10 +294,15 @@
 
   <!-- 4. График динамики -->
   <div class="section">
-    <h2>📈 Граф динамики нитей</h2>
+  <h2>📈 Граф динамики нитей</h2>
+  <div id="threadChartContainer">
     <canvas id="threadChart" height="100"></canvas>
+    <div id="noDataMessage" class="empty-state" style="display: none;">
+      Нет данных для отображения. Добавьте записи в «Ежедневный анализ нитей».
+    </div>
     <button onclick="downloadChart('threadChart')">💾 Скачать график</button>
   </div>
+</div>
 
   <!-- 5. История записей -->
   <div class="section">
@@ -525,20 +539,30 @@
 
   // Обновление графика
   function updateChart() {
-  const ctx = document.getElementById('threadChart')?.getContext('2d');
-  const container = document.getElementById('threadChart').parentElement; // Контейнер графика
-  
-  // Если данных нет - скрываем блок
+  // Получаем элементы DOM
+  const canvas = document.getElementById('threadChart');
+  const container = canvas.parentElement; // Контейнер графика
+  const noDataMessage = document.getElementById('noDataMessage'); // Сообщение "Нет данных"
+
+  // Проверяем, есть ли данные
   if (db.length === 0) {
-    container.style.display = 'none';
-    return;
+    noDataMessage.style.display = 'block'; // Показываем сообщение
+    canvas.style.display = 'none';         // Скрываем canvas
+    if (window.threadChartInstance) {
+      window.threadChartInstance.destroy(); // Уничтожаем старый график
+    }
+    return; // Выходим из функции
   }
-  
-  // Если данные есть - показываем блок
-  container.style.display = 'block';
-  
+
+  // Если данные есть:
+  noDataMessage.style.display = 'none';  // Скрываем сообщение
+  canvas.style.display = 'block';        // Показываем canvas
+
+  // Подготовка данных для графика
+  const ctx = canvas.getContext('2d');
   const labels = [...new Set(db.map(e => e.date))].sort();
   const types = ['физическая', 'эмоциональная', 'ментальная', 'социальная', 'духовная', 'временная'];
+  
   const datasets = types.map(type => ({
     label: type,
     data: labels.map(date => db.filter(e => e.date === date && e.type === type).length),
@@ -546,17 +570,22 @@
     fill: true,
     tension: 0.3
   }));
-  
+
+  // Уничтожаем старый график (если был)
   if (window.threadChartInstance) {
     window.threadChartInstance.destroy();
   }
-  
-    window.threadChartInstance = new Chart(ctx, {
-      type: 'line',
-      data: { labels, datasets },
-      options: { responsive: true, scales: { y: { beginAtZero: true } } }
-    });
-  }
+
+  // Создаём новый график
+  window.threadChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+}
 
   // Расчет потока
   function calculateFlow() {
