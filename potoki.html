@@ -171,6 +171,15 @@
       color: #666;
       font-style: italic;
     }
+    #noDataMessage {
+      font-style: italic;
+      background: #f9f9f9;
+      border-radius: 5px;
+    }
+    .dark-mode #noDataMessage {
+      background: #333;
+      color: #ddd;
+    }
   </style>
 </head>
 <body>
@@ -285,10 +294,15 @@
 
   <!-- 4. График динамики -->
   <div class="section">
-    <h2>📈 Граф динамики нитей</h2>
+  <h2>📈 Граф динамики нитей</h2>
+  <div id="threadChartContainer">
     <canvas id="threadChart" height="100"></canvas>
-    <button onclick="downloadChart('threadChart')">💾 Скачать график</button>
+    <div id="noDataMessage" style="display: none; text-align: center; padding: 20px; color: #666;">
+      Нет данных для отображения. Добавьте записи в «Ежедневный анализ нитей».
+    </div>
+    <button onclick="downloadChart('threadChart')" style="display: none;">💾 Скачать график</button>
   </div>
+</div>
 
   <!-- 5. История записей -->
   <div class="section">
@@ -525,38 +539,27 @@
 
   // Обновление графика
   function updateChart() {
-  const ctx = document.getElementById('threadChart')?.getContext('2d');
-  const container = document.getElementById('threadChart').parentElement; // Контейнер графика
-  
-  // Если данных нет - скрываем блок
+  const canvas = document.getElementById('threadChart');
+  const container = canvas.parentElement;
+  const noDataMessage = document.getElementById('noDataMessage');
+  const downloadBtn = document.querySelector('#threadChartContainer button'); // Получаем кнопку скачивания
+
   if (db.length === 0) {
-    container.style.display = 'none';
+    noDataMessage.style.display = 'block';
+    canvas.style.display = 'none';
+    downloadBtn.style.display = 'none'; // Скрываем кнопку скачивания
+    if (window.threadChartInstance) {
+      window.threadChartInstance.destroy();
+    }
     return;
   }
-  
-  // Если данные есть - показываем блок
-  container.style.display = 'block';
-  
-  const labels = [...new Set(db.map(e => e.date))].sort();
-  const types = ['физическая', 'эмоциональная', 'ментальная', 'социальная', 'духовная', 'временная'];
-  const datasets = types.map(type => ({
-    label: type,
-    data: labels.map(date => db.filter(e => e.date === date && e.type === type).length),
-    borderWidth: 1,
-    fill: true,
-    tension: 0.3
-  }));
-  
-  if (window.threadChartInstance) {
-    window.threadChartInstance.destroy();
-  }
-  
-    window.threadChartInstance = new Chart(ctx, {
-      type: 'line',
-      data: { labels, datasets },
-      options: { responsive: true, scales: { y: { beginAtZero: true } } }
-    });
-  }
+
+  noDataMessage.style.display = 'none';
+  canvas.style.display = 'block';
+  downloadBtn.style.display = 'block'; // Показываем кнопку скачивания
+
+  // Остальной код создания графика...
+}
 
   // Расчет потока
   function calculateFlow() {
