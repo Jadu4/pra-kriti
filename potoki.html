@@ -496,12 +496,12 @@
   db.push(entry);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
   
-  // Теперь обновляем ВСЕ визуальные компоненты:
-  updateHistory();    // Обновляем список записей
-  updateChart();      // Перерисовываем график ← ЭТОГО не хватало!
-  clearForm();        // Очищаем форму
+  updateHistory();
+  updateChart();
+  clearForm();
   
-  alert("✅ Запись успешно сохранена");
+  // Уведомление больше не показывается
+  return;
 }
 
   // Очистка формы после сохранения
