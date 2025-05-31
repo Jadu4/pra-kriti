@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Центр основания: Энергия, Клетка, Регенерация</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"  rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+  <style>
+    body {
+      background-color: #f9f9f9;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    h2 {
+      color: #2a4d69;
+      border-bottom: 2px solid #2a4d69;
+      padding-bottom: 5px;
+      margin-top: 30px;
+    }
+    .diagram img {
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+      margin: 10px auto;
+      display: block;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .card {
+      transition: transform 0.3s ease;
+    }
+    .card:hover {
+      transform: scale(1.02);
+    }
+    .tab-content {
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+    @media (max-width: 768px) {
+      .diagram img {
+        max-width: 100%;
+      }
+      canvas {
+        max-width: 100%;
+        height: auto !important;
+      }
+    }
+    canvas {
+      max-width: 100%;
+      height: auto !important;
+    }
+  </style>
+</head>
+<body class="container-fluid py-4">
+
+  <h1 class="text-center mb-4">Центр основания: Энергия, Клетка, Регенерация</h1>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="system-tab" data-bs-toggle="tab" data-bs-target="#system" type="button">Обзор системы</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="mechanism-tab" data-bs-toggle="tab" data-bs-target="#mechanism" type="button">Механизмы влияния</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="centrosome-tab" data-bs-toggle="tab" data-bs-target="#centrosome" type="button">Центросома</button>
+    </li>
+  </ul>
+
+  <!-- Tab Contents -->
+  <div class="tab-content">
+
+    <!-- Tab 1: Обзор системы -->
+    <div class="tab-pane fade show active" id="system" role="tabpanel">
+      <h2>Центр основания и его физиологические корреляты</h2>
+      <p>Центр основания — это не просто абстрактная концепция. Он связан с реальными системами тела, содержащими стволовые клетки:</p>
+
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <ul>
+            <li><strong>Почки</strong> — источник цзин (жизненной силы), регулятор жидкостных и гормональных систем.</li>
+            <li><strong>Костный мозг</strong> — производит кроветворные стволовые клетки.</li>
+            <li><strong>Кишечник</strong> — дом для кишечных стволовых клеток и иммунной активности.</li>
+            <li><strong>Половые органы</strong> — содержат гонадные стволовые клетки.</li>
+            <li><strong>Жировая ткань</strong> — резервуар мезенхимальных стволовых клеток.</li>
+          </ul>
+        </div>
+        <div class="col-md-6 diagram">
+          <img src="https://jadu4.github.io/pra-kriti/content/img/sloi.png"  alt="Схема Центра основания">
+          <p class="text-muted text-center">Связь Центра основания с физиологическими системами</p>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <h4>Научные параллели</h4>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="card p-3">
+              <h5>Костный мозг</h5>
+              <p>Гемопоэтические стволовые клетки обеспечивают кроветворение и иммунитет.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card p-3">
+              <h5>Жировая ткань</h5>
+              <p>Мезенхимальные стволовые клетки способствуют восстановлению тканей.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card p-3">
+              <h5>Кишечник</h5>
+              <p>Кишечные стволовые клетки поддерживают здоровье микробиома и слизистой оболочки.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Механизмы влияния -->
+    <div class="tab-pane fade" id="mechanism" role="tabpanel">
+      <h2>Механизмы влияния: от сознания к клетке</h2>
+      <p>Воздействие начинается с дыхательных практик и медитации и проникает глубоко в клеточные процессы.</p>
+
+      <!-- График-цепочка -->
+      <h4>Процесс воздействия</h4>
+      <canvas id="chainChart" width="800" height="200"></canvas>
+
+      <!-- Диаграмма сигнальных путей -->
+      <h4 class="mt-4">Сигнальные пути</h4>
+      <p>Активация стволовых клеток через нейроэндокринную регуляцию:</p>
+      <ul>
+        <li><strong>Hippo путь</strong> — управляет размером органов и делением стволовых клеток.</li>
+        <li><strong>AMPK/mTOR</strong> — метаболический контроль и регенерация.</li>
+      </ul>
+
+      <!-- Подробное описание Hippo пути -->
+      <div class="alert alert-info mt-3">
+        <h5>Путь Hippo</h5>
+        <p>
+          Путь Hippo является ключевым регулятором размера органов и контролирует деление стволовых клеток посредством регулирования клеточной пролиферации и апоптоза.
+          Основные эффекты этого пути осуществляются через киназы MST1/2 и LATS1/2, которые ингибируют активность транскрипционных коактиваторов YAP и TAZ,
+          тем самым регулируя рост и обновление тканей.
+          В частности, Hippo-путь играет важную роль в поддержании гомеостаза органов, контролируя размер и предотвращая чрезмерное деление клеток,
+          что также связано с регуляцией стволовых клеток.
+        </p>
+      </div>
+
+      <!-- График гормонов -->
+      <h4 class="mt-4">Изменение уровня гормонов</h4>
+      <div class="d-flex justify-content-center">
+        <canvas id="hormoneChart" width="300" height="200"></canvas>
+      </div>
+
+      <!-- Интерактивная таблица -->
+      <h4 class="mt-4">Таблица методов и их эффектов</h4>
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>Метод</th>
+            <th>Целевая система</th>
+            <th>Эффект</th>
+            <th>Научное подтверждение</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Диафрагмальное дыхание</td>
+            <td>Парасимпатическая НС</td>
+            <td>Снижение уровня кортизола</td>
+            <td>HRV исследования</td>
+          </tr>
+          <tr>
+            <td>Медитация</td>
+            <td>Гиппокамп, префронтальная кора</td>
+            <td>Рост BDNF, удлинение теломер</td>
+            <td>Исследования у медитирующих</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Радарный график -->
+      <h4 class="mt-4">Радарный график: показатели здоровья до и после практик</h4>
+      <div class="d-flex justify-content-center">
+        <canvas id="radarChart" width="300" height="250"></canvas>
+      </div>
+    </div>
+
+    <!-- Tab 3: Центросома -->
+    <div class="tab-pane fade" id="centrosome" role="tabpanel">
+      <h2>Роль центросомы и внутриклеточных механизмов</h2>
+      <p>Центросома — ключевой органоид, регулирующий деление клеток и поддержание стволовой популяции.</p>
+
+      <!-- Анимированная модель -->
+      <h4>Модель центросомы</h4>
+      <div class="diagram">
+        <img src="https://jadu4.github.io/pra-kriti/content/img/Centrosoma.png"  alt="Центросома">
+        <p class="text-muted text-center">Упрощённая модель центросомы</p>
+      </div>
+
+      <h4>Рост центриолей</h4>
+      <div class="diagram">
+        <img src="https://jadu4.github.io/pra-kriti/content/img/rost_centrioli.png"  alt="Рост центриолей">
+        <p class="text-muted text-center">Процесс формирования новых центриолей</p>
+      </div>
+
+      <!-- Описание частей -->
+      <h4 class="mt-4">Части центросомы</h4>
+      <ul>
+        <li><strong>Центриоли</strong> — организуют веретено деления.</li>
+        <li><strong>PCM</strong> — матрикс, участвующий в сборке микротрубочек.</li>
+        <li><strong>SPD-5 / PLK-1</strong> — белки, регулирующие каркас центросомы.</li>
+        <li><strong>SUMOylation</strong> — модификация белков, способствует активации стволовых клеток.</li>
+      </ul>
+
+      <!-- Сравнительная таблица -->
+      <h4 class="mt-4">Сравнение состояний</h4>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Процесс</th>
+            <th>Нормальный уровень</th>
+            <th>При воздействии через практики</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Фосфорилирование SPD-5</td>
+            <td>Баланс между динамичным и стабильным каркасом</td>
+            <td>Оптимизация деления стволовых клеток</td>
+          </tr>
+          <tr>
+            <td>SUMOylation</td>
+            <td>Подавление Warts</td>
+            <td>Активация нейральных стволовых клеток</td>
+          </tr>
+          <tr>
+            <td>Теломеразная активность</td>
+            <td>Постепенное укорочение</td>
+            <td>Увеличение длины теломер</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> 
+  <script>
+    // Chart for mechanism chain
+    const ctx = document.getElementById('chainChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Дыхательные техники', 'Снижение стресса', 'Гормональная регуляция', 'Активация стволовых клеток', 'Регенерация тканей'],
+        datasets: [{
+          label: 'Процесс воздействия',
+          data: [1, 2, 3, 4, 5],
+          borderColor: '#2a4d69',
+          fill: false,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { display: false },
+          x: { ticks: { autoSkip: false } }
+        }
+      }
+    });
+
+    // Hormone chart - Horizontal Bar
+    const hormCtx = document.getElementById('hormoneChart').getContext('2d');
+    new Chart(hormCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Кортизол', 'Мелатонин', 'Гормон роста', 'BDNF'],
+        datasets: [{
+          label: 'До практик',
+          data: [4.5, 1.2, 2.3, 1.5],
+          backgroundColor: '#ff7300'
+        }, {
+          label: 'После практик',
+          data: [2.1, 3.8, 4.0, 5.0],
+          backgroundColor: '#2a4d69'
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top' },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+          x: {
+            stacked: false,
+            beginAtZero: true,
+            ticks: { max: 6 }
+          },
+          y: {
+            stacked: false
+          }
+        }
+      }
+    });
+
+    // Radar chart
+    const radarCtx = document.getElementById('radarChart').getContext('2d');
+    new Chart(radarCtx, {
+      type: 'radar',
+      data: {
+        labels: ['Кортизол', 'Мелатонин', 'Гормон роста', 'BDNF', 'Теломеры'],
+        datasets: [{
+          label: 'До практик',
+          data: [4.5, 1.2, 2.3, 1.5, 9.2],
+          backgroundColor: 'rgba(255, 115, 0, 0.3)',
+          borderColor: '#ff7300',
+          pointBackgroundColor: '#ff7300'
+        }, {
+          label: 'После практик',
+          data: [2.1, 3.8, 4.0, 5.0, 10.1],
+          backgroundColor: 'rgba(42, 77, 105, 0.3)',
+          borderColor: '#2a4d69',
+          pointBackgroundColor: '#2a4d69'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        elements: {
+          line: {
+            borderWidth: 2
+          }
+        },
+        scale: {
+          angleLines: { display: true },
+          ticks: { beginAtZero: true, max: 12 }
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
