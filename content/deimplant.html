@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Деимплантация</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: #0f0f0f; 
+            color: #f0f0f0;
+        }
+
+        header {
+            background: linear-gradient(to right, #4a00e0, #8e2de2);
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            background: #1a1a1a;
+        }
+
+        .tab {
+            flex: 1 1 auto;
+            min-width: 120px;
+            text-align: center;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab.active {
+            border-bottom: 3px solid #8e2de2;
+            font-weight: bold;
+        }
+
+        .content {
+            display: none;
+            padding: 20px;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        /* Impact cards */
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: #1c1c1c;
+            padding: 20px;
+            border-radius: 12px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 15px rgba(142, 45, 226, 0.3);
+        }
+
+        canvas {
+            max-width: 100%;
+        }
+
+        /* Guide steps */
+        .guide-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .step {
+            background: #1c1c1c;
+            padding: 20px;
+            border-left: 5px solid #8e2de2;
+            border-radius: 10px;
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+
+        .step:hover {
+            transform: translateX(5px);
+        }
+
+        .details {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            font-size: 0.95em;
+        }
+        .audio-player {
+            background: #1c1c1c;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .audio-player:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 15px rgba(142, 45, 226, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+<header>Деимплантация квантово-энергетических устройств</header>
+
+<nav>
+    <div class="tab active" onclick="openTab(event, 'implants')">Виды имплантов</div>
+    <div class="tab" onclick="openTab(event, 'impact')">Влияние на жизнь</div>
+    <div class="tab" onclick="openTab(event, 'guide')">Руководство</div>
+</nav>
+
+<!-- Tab 1 -->
+<div id="implants" class="content active">
+    <h2>Виды имплантов</h2>
+    <p>Импланты могут быть физическими, энергетическими, ментальными и астральными.</p>
+
+    <!-- Карточки с информацией -->
+    <div class="impact-grid">
+        <!-- Карточка с видео -->
+        <div class="card">
+            <h4>Видео о деимплантации</h4>
+            <iframe width="300" height="300" src="https://www.youtube.com/embed/ZGQxymQXAfE?autoplay=0&controls=1&modestbranding=1&rel=0" frameborder="0" allowfullscreen></iframe>
+        </div>
+
+        <!-- Ментальные импланты -->
+        <div class="card">
+            <h4>Ментальные импланты</h4>
+            <p><strong>Расположение:</strong> Ментальное тело</p>
+            <ul>
+                <li><strong>Коррекция мышления:</strong> Направление мыслей по заданному вектору.</li>
+                <li><strong>Перехват мыслительного потока:</strong> Анализ зарождающихся идей и блокировка "опасных" для системы.</li>
+                <li><strong>Формирование и подмена смыслов:</strong> Искажение изначальных светлых идей, превращение созидания в потребление.</li>
+            </ul>
+        </div>
+
+        <!-- Астральные импланты -->
+        <div class="card">
+            <h4>Астральные импланты</h4>
+            <p><strong>Расположение:</strong> Астральное (эмоциональное) тело</p>
+            <ul>
+                <li><strong>Формирование поведенческих аспектов:</strong> Создание устойчивых реакций на внешние раздражители (например, агрессия в ответ на критику).</li>
+                <li><strong>Подмена смыслов, влияющих на самоопределение:</strong> Внедрение ложных ценностей, влияющих на выбор партнера, профессии, жизненного пути.</li>
+                <li><strong>Подмена понятий в аспектах взаимодействий:</strong> Искажение понятий любви, дружбы, долга.</li>
+            </ul>
+        </div>
+
+        <!-- Эфирные и физические импланты -->
+        <div class="card">
+            <h4>Эфирные и физические импланты</h4>
+            <p><strong>Расположение:</strong> Эфирное (энергетическое двойник) и физическое тела</p>
+            <ul>
+                <li><strong>Управление белковой оболочкой:</strong> Перераспределение электрохимических сигналов в нервной системе.</li>
+                <li><strong>Частичное или полное управление механизмами жизнедеятельности:</strong> Влияние на гормональную систему, метаболизм, клеточное деление.</li>
+                <li><strong>Физические импланты в теле:</strong> Могут представлять собой микроскопические устройства на основе кристаллов или органических соединений, расположенные в нервных узлах, мозге или жизненно важных органах.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Tab 2 -->
+<div id="impact" class="content">
+    <h2>Влияние имплантов на жизнь</h2>
+    <p>Импланты — это инородные энергоинформационные или квантово-физические устройства, интегрированные в многомерную структуру человека (физическую, эфирную, астральную, ментальную) с целью контроля, управления и сбора энергетического потенциала.</p>
+
+    <section style="margin-top: 20px;">
+        <h3>Основные цели установки имплантов:</h3>
+        <div class="impact-grid">
+            <div class="card">
+                <h4>Контроль сознания</h4>
+                <p>Перехват и анализ мыслительного потока, подмена смыслов, формирование нужных управляющей системе убеждений и мировоззрения.</p>
+            </div>
+            <div class="card">
+                <h4>Управление поведением</h4>
+                <p>Формирование поведенческих паттернов, эмоциональных реакций (страх, гнев, уныние) для генерации низкочастотной энергии.</p>
+            </div>
+            <div class="card">
+                <h4>Ограничение потенциала</h4>
+                <p>Блокировка творческих импульсов, созидательной энергии и связи с высшими аспектами своего "Я". Пример: человек, стремящийся творить для блага мира, незаметно для себя переключается на эгоистичные цели, выхолащивая изначальный смысл своего дела.</p>
+            </div>
+            <div class="card">
+                <h4>Управление физиологией</h4>
+                <p>Вмешательство в биохимические и электрохимические процессы организма для контроля здоровья, жизненного тонуса и продолжительности жизни.</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Tab 3 -->
+<div id="guide" class="content">
+    <h2>Практическая методология деимплантации</h2>
+    <p>Ниже представлена полная последовательность действий для самостоятельной работы:</p>
+
+    <div class="guide-steps">
+
+        <!-- Шаг 1 -->
+        <div class="step" onclick="toggleDetails('step1')">
+            <h3>Шаг 1: Обнаружение и локализация импланта</h3>
+            <div class="details" id="step1">Создание резонансной волны радости и сканирование тела. Локализация точек искажения. Необходимо просканировать всё тело и отметить места, где волна радости меняется на страх или пустоту.</div>
+        </div>
+
+        <!-- Шаг 2 -->
+        <div class="step" onclick="toggleDetails('step2')">
+            <h3>Шаг 2: Идентификация микроволокон</h3>
+            <div class="details" id="step2">Зондирование импланта микро-импульсами и определение соединительных нейроволокон. Задача — ощутить количество и направление связей вокруг тела импланта.</div>
+        </div>
+
+        <!-- Шаг 3 -->
+        <div class="step" onclick="toggleDetails('step3')">
+            <h3>Шаг 3: Выжигание нейроволокон</h3>
+            <div class="details" id="step3">Формирование "лазера" из Центра Основания и прицельное выжигание всех связей импланта. Процесс продолжается до полного прекращения активности импланта.</div>
+        </div>
+
+        <!-- Шаг 4 -->
+        <div class="step" onclick="toggleDetails('step4')">
+            <h3>Шаг 4: Нейтрализация управляющего элемента</h3>
+            <div class="details" id="step4">Поиск центрального процессора импланта через зондирование и его последующее выжигание. Это ключевой момент, поскольку именно он генерирует управляющий сигнал.</div>
+        </div>
+
+        <!-- Шаг 5 -->
+        <div class="step" onclick="toggleDetails('step5')">
+            <h3>Шаг 5: Очищение и интеграция</h3>
+            <div class="details" id="step5">Команда иммунной системе на удаление остатков импланта. После этого важно заполнить освободившееся пространство световой энергией и восстановить целостность энергетических потоков.</div>
+        </div>
+
+    </div>
+
+    <!-- Аудиоплеер -->
+    <h3>Медитация для деимплантации</h3>
+    <div class="audio-player">
+        <p>Прослушайте эту медитацию, чтобы помочь себе в процессе деимплантации.</p>
+        <center><iframe src="https://drive.google.com/file/d/1CyyTlCJvZCBU-waw6kbZJWceRR7K9oQ-/preview"  width="350" height="65" allow="autoplay"></iframe></center>
+    </div>
+
+    <h2>Виды дестабилизации, дисфункции и дезинтеграции устройств</h2>
+    <div class="impact-grid">
+        <div class="card">
+            <h4>Дисфункция</h4>
+            <p>Устройство перестает выполнять свою основную программу. Например, имплант, предназначенный для подавления воли, начинает генерировать хаотичные эмоциональные всплески.</p>
+        </div>
+        <div class="card">
+            <h4>Дестабилизация</h4>
+            <p>Нарушение связи импланта со структурами тонких тел. "Нейроволокна" и "антенны" устройства начинают терять контакт, что вызывает локальные боли, энергетические "пробои", ощущение инородного присутствия.</p>
+        </div>
+        <div class="card">
+            <h4>Дезинтеграция</h4>
+            <p>Полный или частичный распад структуры импланта. Это самый опасный для носителя процесс, если он происходит спонтанно. Продукты распада могут быть токсичны для тонких и физического тел, вызывая болезни и системные сбои. Целенаправленная работа по деимплантации как раз и заключается в управляемой дезинтеграции с последующим безопасным выводом остаточных элементов.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Main Script -->
+<script>
+    // Переключение вкладок
+    function openTab(evt, tabName) {
+        const tabs = document.querySelectorAll('.tab');
+        const contents = document.querySelectorAll('.content');
+
+        tabs.forEach(tab => tab.classList.remove('active'));
+        contents.forEach(content => content.classList.remove('active'));
+
+        evt.currentTarget.classList.add('active');
+        document.getElementById(tabName).classList.add('active');
+    }
+
+    // Раскрытие деталей
+    function toggleDetails(id) {
+        const el = document.getElementById(id);
+        if (el.style.display === 'block') {
+            el.style.display = 'none';
+        } else {
+            el.style.display = 'block';
+        }
+    }
+</script>
+
+</body>
+</html>
